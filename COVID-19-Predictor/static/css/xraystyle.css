@@ -1,0 +1,37 @@
+form{
+    width: 40%;
+    margin: 10% 30%;
+    text-align: center
+}
+
+.form-control{
+
+   height: 200px;
+    border: gray dashed 3px;
+    border-radius: 2px;
+    background-color : transparent
+
+}
+img{
+
+    width: 20%;
+    text-align: center;
+}
+h3{
+    margin-top: 2%;
+}
+
+input.button{
+background-color : transparent
+}
+
+#covid{
+color : red;
+border : red solid 2px ;
+border-radius : 50%
+
+}
+
+p{
+color-red
+}

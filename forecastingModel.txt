@@ -1,0 +1,81 @@
+import math
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+from   tensorflow.keras.preprocessing.sequence import TimeseriesGenerator
+
+df_confirmed_country = pd.read_csv('cairov2.csv',index_col='Date',parse_dates=True)
+
+
+train_set = df_confirmed_country.iloc[:math.ceil(80 / 100 * len(df_confirmed_country))]
+test_set = df_confirmed_country.iloc[math.ceil(80 / 100 * len(df_confirmed_country)):]
+
+
+print(df_confirmed_country)
+
+scaler = MinMaxScaler()
+scaler.fit(train_set)
+
+scaled_train=scaler.transform(train_set)
+
+
+
+
+
+
+n_input = 45
+n_feature=1
+generator = TimeseriesGenerator(scaled_train,scaled_train,length=n_input,batch_size=1)
+
+
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM , Dense
+
+model = Sequential()
+model.add(LSTM(100,activation='relu',return_sequences=True, input_shape=(n_input,n_feature)))
+
+model.add(LSTM(50,activation='relu'))
+
+model.add(Dense(32))
+
+model.add(Dense(1))
+model.compile(optimizer='adam',loss='mse',metrics=['accuracy'])
+model.summary()
+
+
+history= model.fit(generator,epochs=12)
+
+his_dict = history.history
+
+
+train_loss=his_dict['loss']
+val_loss=his_dict['accuracy']
+plt.plot(train_loss,label="train loss")
+plt.plot(val_loss,label="val loss")
+plt.legend()
+plt.show()
+
+
+
+test_predictions = []
+
+first_eval_batch = scaled_train[-n_input:]
+current_batch = first_eval_batch.reshape((1, n_input, n_feature))
+
+for i in range(len(test_set)):
+    current_pred = model.predict(current_batch)[0]
+    test_predictions.append(current_pred)
+    current_batch = np.append(current_batch[:, 1:, :], [[current_pred]], axis=1)
+
+
+
+true_predictions = scaler.inverse_transform(test_predictions)
+
+test_set['predictions'] = true_predictions
+test_set.to_csv('forecasting.csv')
+test_set.plot(figsize=(14,5))
+plt.plot(true_predictions)
+plt.show()
+

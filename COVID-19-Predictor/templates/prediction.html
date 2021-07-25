@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+{%load static%}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19-Predictor</title>
+    <link href="{%static 'css/bootstrap.min.css'%}" type="text/css" rel="stylesheet">
+    <link href="/static/css/index.css?{% now 'U' %}" type="text/css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+ <header class="col-lg-12 col-md-12 col-sm-12" id="header">
+       <div class="row">
+        <div class="firstNav col-lg-12">
+            <div>
+                <p class="coivd">COVID19</p>
+                <p class="predictor">PREDICTOR</p>
+
+            </div>
+            <a>About Us</a>
+        </div>
+       </div>
+        <hr>
+        <div class="container">
+            <div class="row secondNav">
+                <div class="col-lg-3 col-sm-6" class="nav-item"><a href="{%url 'index'%}">Actual Cases</a></div>
+                 <div class="col-lg-3 col-sm-6" class="nav-item"><a href="{%url 'prediction'%}">Projection</a></div>
+                <div class="col-lg-3 col-sm-6" class="nav-item"><a href="{%url 'xray'%}">X-rays</a ></div>
+                <div class="col-lg-3 col-sm-6" class="nav-item"><a onclick="switchMode()"><img id="mode-btn" src="{%static 'imgs/moon.png'%}"></a></div>
+            </div>
+        </div>
+
+    </header>
+    <div class="container-fluid">
+        <div class="row second-row">
+            <div class="col-lg-9">
+                <div id = "search col-lg-12">
+                    <select id='select' class="search" onchange="choosenCountryInMap()">
+
+                    </select>
+            </div>
+            <div class="col-lg-12 options">
+
+                <button class="confirmed" id="confirmed" data-status="confirm" onclick="changeMap(this.id);" data-T1='dark'>
+                    <h1>Confirmed</h1>
+                    <h1 class="country-current-data">1.5553</h1>
+                    <h4><span>Today+</span>1.04.05.300</h4>
+                </button>
+                <button class="death" id="death" data-status="death" onclick="changeMap(this.id);" data-T2='dark'>
+                    <h1>Death</h1>
+                    <h1 class="country-current-data">1.5553</h1>
+                    <h4><span>Today+</span>1.04.05.300</h4>
+                </button>
+                <button class="recovered" id="recovered" data-status="recover" onclick="changeMap(this.id);" data-T3='dark'>
+                    <h1>Recovered</h1>
+                    <h1 class="country-current-data">1.5553</h1>
+                    <h4><span>Today+</span>1.04.05.300</h4>
+                </button>
+
+                </div>
+
+
+        </div>
+
+        <div class="col-lg-3" id="map">
+            <div class="countryInfo">
+                <h2 id="countryName" class="colred-status">Switzerland</h2>
+                <p>Last Update On 09 jan 1:21 AM IST</p>
+                <h2 id="countryNum" class="colred-status">2,178</h2>
+                <h5 id="countryState" class="colred-status">Confirmed</h5>
+            </div>
+            <div class="mapImg">
+                <img src="{%static 'imgs/co.png'%}" id="stausMap">
+
+            </div>
+        </div>
+        </div>
+
+        <!--- table section---->
+        <div class="row" id="selectors">
+            <div id="filter_selector" class="col-lg-6 col-md-12">
+                <select id="mySelect" onchange="filterBy()" class="col-lg-6">
+      <option value="" disabled selected hidden>Filter By</option>
+      <option value="Confirmed">Confirmed</option>
+      <option value="Death">Death</option>
+      <option value="Recovered">Recovered</option>
+      <option value="All">All</option>
+                </select>
+             </div>
+
+            <div id="country_selector" class="col-lg-6 col-md-12" >
+            <select id="country-Select" onchange="callCountryChart()" class="col-lg-6">
+                <!--<option value="" disabled selected hidden>Swizerland</option>-->
+            </select>
+
+            </div>
+        </div>
+
+
+        <div class="row " id="title_display_none">
+
+            <div class="col-lg-6 col-md-12">
+
+                    <h2 id="Ttitle">Actual Cases</h2>
+
+            </div>
+            <div class="col-lg-6 col-md-12">
+
+                <input type="date" class="date" id="date-picker" onchange="filterTable()">
+            </div>
+        </div>
+        <div class="row">
+
+            <div class="col-lg-6 col-md-12" id="icons_display_none">
+                <button class="global" data-type='continent' onclick="changeGlobal()" id='type'><img src="{%static 'imgs/global-icon-png-27.png'%}" class="icon"></button>
+                <button class="sort" data-order='asc' id="sortBt" onclick="sort()"><img src="{%static 'imgs/up-and-down-arrow-icon-10.png'%}" class="icon"></button>
+                <button class="help"  onclick="showHelp()"><img src="{%static 'imgs/question-512.png'%}" class="icon"></button>
+
+            </div>
+            <div class="col-lg-6" id="empty_display_block" ></div>
+
+            <div class="col-lg-6" >
+                <div id="TGIcons">
+                    <button class="">
+                        <img src="{%static 'imgs/table.png'%}" id="tableIcon" onclick="showTable()">
+
+                    </button>
+                    <span>Table</span>
+                    <button class="">
+                        <img src="{%static 'imgs/graph.png'%}"  id="graphIcon" onclick="showGraph()">
+
+                    </button>
+                    <span>Graph</span>
+
+                </div>
+
+
+            </div>
+            <div id="helpdiv" class="col-lg-4">
+                <div><span class="helpDisc">Country/Countinent</span><img src="{%static 'imgs//global-icon-png-27.png'%}" class="helpIcon"> </div>
+
+                <div><span class="helpDisc">Sort ASC or DECS (based on date)</span><img src="{%static 'imgs/up-and-down-arrow-icon-10.png'%}" class="helpIcon"> </div>
+
+             </div>
+        </div>
+        <div class="row"id="MyTable">
+            <table class="col-lg-12" >
+                <thead id="tableHead">
+
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+
+            </table>
+
+        </div>
+        <div id="charts">
+                       <div class="row" id="status-chart">
+                <!--<canvas id="myChart"></canvas>-->
+            </div>
+
+
+            <div class="row" id="statistic-charts">
+                <div class="col-lg-6">
+                    <div class="row" id="respect-elements">
+                        <select id="respect1" onchange="showRespectChart()" class="col-lg-4">
+                              <!--<option value="" disabled selected hidden>Swizerland</option>-->
+
+                         </select>
+                        <span class="col-lg-4" id="respect2">Respect To</span>
+                        <select id="respect3" onchange="showRespectChart()" class="col-lg-4">
+                             <!--<option value="" disabled selected hidden>Swizerland</option>-->
+
+                         </select>
+                    </div>
+                    <div class="row" id="respectChartContainer">
+
+                         <canvas id="respectChart" class=""></canvas>
+                    </div>
+
+                    <div class="row status-buttons" >
+                        <button class="col-lg-4">Confirmed</button>
+                        <button class="col-lg-4">Death</button>
+                        <button class="col-lg-4">Recovered</button>
+                    </div>
+
+                </div>
+                <div class="col-lg-6">
+                     <div class="row" id="ratio-element">
+                        <select id="ratio"  class="col-lg-4">
+                             <!--<option value="" disabled selected hidden>Swizerland</option>-->
+
+                        </select>
+                     </div>
+                    <div class="row">
+                        <canvas id="ratioChart" ></canvas>
+                    </div>
+
+                    <div class="row status-buttons" >
+                        <button class="col-lg-4">Confirmed</button>
+                        <button class="col-lg-4">Death</button>
+                        <button class="col-lg-4">Recovered</button>
+                    </div>
+                </div>
+
+
+
+            </div>
+            </div>
+
+
+
+    </div>
+    {%for set in set%}
+    {{set.location}}
+    {%endfor%}
+{{ value|json_script:"mydata" }}
+    <script type="text/javascript">
+       var wholeData ={{wholeData|safe}};
+       var countriesName ={{countriesName|safe}}
+       var data1= {{ data1|safe }};
+       var data2= {{ data2|safe }};
+       var label ={{label|safe}};
+       var set =JSON.parse('{{set|safe}}');
+
+
+   </script>
+<script>
+
+
+
+function changeMap(id){
+
+if(id=="confirmed"){
+   document.getElementById("stausMap").src = "{%static 'imgs/co.png'%}";
+   document.getElementsByClassName("colred-status")[0].style="color:blue"
+   document.getElementsByClassName("colred-status")[1].style="color:blue"
+   document.getElementsByClassName("colred-status")[2].style="color:blue"
+
+}
+else if(id=="death"){
+    document.getElementById("stausMap").src = "/static/imgs/de.png";
+    document.getElementsByClassName("colred-status")[0].style="color:red"
+    document.getElementsByClassName("colred-status")[1].style="color:red"
+    document.getElementsByClassName("colred-status")[2].style="color:red"
+
+}
+else{
+document.getElementById("stausMap").src = "{%static 'imgs/re.png'%}";
+document.getElementsByClassName("colred-status")[0].style="color:green"
+document.getElementsByClassName("colred-status")[1].style="color:green"
+document.getElementsByClassName("colred-status")[2].style="color:green"
+
+}
+}
+
+</script>
+
+
+    <script src="{%static 'js/jquery-3.5.1.js'%}"></script>
+    <script src="{%static 'js/bootstrap.min.js'%}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+     <script src="/static/js/index.js?{% now 'U' %}"></script>
+     <script src="/static/js/mode.js?{% now 'U' %}"></script>
+
+</body>
+</html>
